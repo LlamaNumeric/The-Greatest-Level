@@ -8,17 +8,17 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody rb;
 
     [SerializeField]
-    private float speed = 5f;
-    [SerializeField]
-    private float jumpHeight = 5f;
+    private float speed = 8f;
 
-    private float horz, vert, up;
-    private bool hasJumped = false;
+    private float horz, vert;
+
     // Start is called before the first frame update
     void Start()
     {
         anim = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
+
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
     // Update is called once per frame
@@ -26,16 +26,18 @@ public class PlayerMovement : MonoBehaviour
     {
         horz = Input.GetAxis("Horizontal");
         vert = Input.GetAxis("Vertical");
-        hasJumped = Input.GetButtonDown("Jump");
-        up = hasJumped ? jumpHeight : 0;
+
+        //rotate camera
+        float h = 10f * Input.GetAxis("Mouse X") * Time.deltaTime;
+        transform.Rotate(0, h, 0);
     }
 
     private void FixedUpdate()
     {
         Vector3 movement = new Vector3(horz, 0, vert);
+        movement = transform.rotation * movement;
 
-        rb.AddForce(movement * speed);
-        rb.AddForce(Vector3.up * jumpHeight);
+        rb.AddForce(movement.normalized * speed);
 
         anim.SetFloat("Horizontal", horz);
         anim.SetFloat("Vertical", vert);
